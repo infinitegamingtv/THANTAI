@@ -7,29 +7,6 @@ let isTeacher = false;
 let myName = "";
 let roomCode = "";
 
-const peerConfig = {
-    config: {
-        'iceServers': [
-            { urls: 'stun:stun.l.google.com:19302' },
-            { urls: 'stun:stun1.l.google.com:19302' },
-            { urls: 'stun:stun2.l.google.com:19302' },
-            { urls: 'stun:stun3.l.google.com:19302' },
-            { urls: 'stun:stun4.l.google.com:19302' },
-            { 
-                urls: 'turn:openrelay.metered.ca:80',
-                username: 'openrelayproject',
-                credential: 'openrelayproject'
-            },
-            { 
-                urls: 'turn:openrelay.metered.ca:443',
-                username: 'openrelayproject',
-                credential: 'openrelayproject'
-            }
-        ]
-    },
-    debug: 2
-};
-
 // State của Giáo viên
 let students = {}; // Format: { peerId: { name, score, online, conn } }
 let isGameActive = false;
@@ -72,8 +49,8 @@ document.getElementById('btn-create-room').addEventListener('click', () => {
     for(let i=0; i<6; i++) roomCode += chars.charAt(Math.floor(Math.random() * chars.length));
     document.getElementById('display-room-code').innerText = "ĐANG KẾT NỐI MÁY CHỦ...";
 
-    // Khởi tạo PeerJS Server với cấu hình STUN
-    peer = new Peer(ROOM_PREFIX + roomCode, peerConfig);
+    // Khởi tạo PeerJS Server mặc định
+    peer = new Peer(ROOM_PREFIX + roomCode);
     
     peer.on('open', (id) => {
         console.log("Phòng đã mở với ID: " + id);
@@ -207,7 +184,7 @@ document.getElementById('btn-join-room').addEventListener('click', () => {
     }
     
     errorMsg.innerText = "Bước 1: Đang khởi tạo kết nối mạng...";
-    peer = new Peer(peerConfig);
+    peer = new Peer();
     
     peer.on('open', () => {
         errorMsg.innerText = "Bước 2: Đang tìm mã phòng " + code + "...";
