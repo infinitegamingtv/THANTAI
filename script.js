@@ -7,6 +7,18 @@ let isTeacher = false;
 let myName = "";
 let roomCode = "";
 
+// Cấu hình WebRTC (Sử dụng STUN servers của Google để tăng tỷ lệ kết nối thành công)
+const peerConfig = {
+    config: {
+        'iceServers': [
+            { urls: 'stun:stun.l.google.com:19302' },
+            { urls: 'stun:stun1.l.google.com:19302' },
+            { urls: 'stun:stun2.l.google.com:19302' }
+        ]
+    },
+    debug: 2
+};
+
 // State của Giáo viên
 let students = {}; // Format: { peerId: { name, score, online, conn } }
 let isGameActive = false;
@@ -49,8 +61,8 @@ document.getElementById('btn-create-room').addEventListener('click', () => {
     for(let i=0; i<6; i++) roomCode += chars.charAt(Math.floor(Math.random() * chars.length));
     document.getElementById('display-room-code').innerText = roomCode;
 
-    // Khởi tạo PeerJS Server
-    peer = new Peer(ROOM_PREFIX + roomCode);
+    // Khởi tạo PeerJS Server với cấu hình STUN
+    peer = new Peer(ROOM_PREFIX + roomCode, peerConfig);
     
     peer.on('open', (id) => {
         console.log("Phòng đã mở với ID: " + id);
@@ -178,7 +190,7 @@ document.getElementById('btn-join-room').addEventListener('click', () => {
     }
     
     errorMsg.innerText = "Đang kết nối...";
-    peer = new Peer();
+    peer = new Peer(peerConfig);
     
     peer.on('open', () => {
         hostConn = peer.connect(ROOM_PREFIX + code);
