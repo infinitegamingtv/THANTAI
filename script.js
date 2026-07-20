@@ -16,7 +16,7 @@ const peerConfig = {
             { urls: 'stun:stun2.l.google.com:19302' }
         ]
     },
-    debug: 2
+    debug: 3
 };
 
 // State của Giáo viên
