@@ -12,6 +12,9 @@ const peerConfig = {
         'iceServers': [
             { urls: 'stun:stun.l.google.com:19302' },
             { urls: 'stun:stun1.l.google.com:19302' },
+            { urls: 'stun:stun2.l.google.com:19302' },
+            { urls: 'stun:stun3.l.google.com:19302' },
+            { urls: 'stun:stun4.l.google.com:19302' },
             { 
                 urls: 'turn:openrelay.metered.ca:80',
                 username: 'openrelayproject',
@@ -208,14 +211,15 @@ document.getElementById('btn-join-room').addEventListener('click', () => {
     
     peer.on('open', () => {
         errorMsg.innerText = "Bước 2: Đang tìm mã phòng " + code + "...";
-        hostConn = peer.connect(ROOM_PREFIX + code, { reliable: true, serialization: 'json' });
+        // Bỏ các cờ cấu hình phụ vì chúng có thể gây lỗi rẽ nhánh dữ liệu trên một số trình duyệt
+        hostConn = peer.connect(ROOM_PREFIX + code);
         
-        // Thêm timeout nếu kẹt ở Bước 2 quá 10 giây
+        // Tăng timeout lên 15 giây
         const timeoutId = setTimeout(() => {
             if(errorMsg.innerText.includes("Bước 2")) {
-                errorMsg.innerText = "Lỗi: Không thể xuyên thủng tường lửa mạng (P2P Timeout).";
+                errorMsg.innerText = "Lỗi: Không thể xuyên thủng tường lửa mạng P2P. Bạn thử phát 3G/4G cho máy tính rồi thử lại xem sao nhé!";
             }
-        }, 10000);
+        }, 15000);
         
         hostConn.on('open', () => {
             clearTimeout(timeoutId);
