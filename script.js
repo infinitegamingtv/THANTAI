@@ -7,16 +7,24 @@ let isTeacher = false;
 let myName = "";
 let roomCode = "";
 
-// Cấu hình WebRTC (Sử dụng STUN servers của Google để tăng tỷ lệ kết nối thành công)
 const peerConfig = {
     config: {
         'iceServers': [
             { urls: 'stun:stun.l.google.com:19302' },
             { urls: 'stun:stun1.l.google.com:19302' },
-            { urls: 'stun:stun2.l.google.com:19302' }
+            { 
+                urls: 'turn:openrelay.metered.ca:80',
+                username: 'openrelayproject',
+                credential: 'openrelayproject'
+            },
+            { 
+                urls: 'turn:openrelay.metered.ca:443',
+                username: 'openrelayproject',
+                credential: 'openrelayproject'
+            }
         ]
     },
-    debug: 3
+    debug: 2
 };
 
 // State của Giáo viên
@@ -200,9 +208,17 @@ document.getElementById('btn-join-room').addEventListener('click', () => {
     
     peer.on('open', () => {
         errorMsg.innerText = "Bước 2: Đang tìm mã phòng " + code + "...";
-        hostConn = peer.connect(ROOM_PREFIX + code, { reliable: true });
+        hostConn = peer.connect(ROOM_PREFIX + code, { reliable: true, serialization: 'json' });
+        
+        // Thêm timeout nếu kẹt ở Bước 2 quá 10 giây
+        const timeoutId = setTimeout(() => {
+            if(errorMsg.innerText.includes("Bước 2")) {
+                errorMsg.innerText = "Lỗi: Không thể xuyên thủng tường lửa mạng (P2P Timeout).";
+            }
+        }, 10000);
         
         hostConn.on('open', () => {
+            clearTimeout(timeoutId);
             errorMsg.innerText = "Bước 3: Đã tìm thấy phòng, đang xin vào...";
             hostConn.send({ type: 'JOIN', name: name });
         });
