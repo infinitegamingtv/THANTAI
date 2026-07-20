@@ -59,13 +59,19 @@ document.getElementById('btn-create-room').addEventListener('click', () => {
     const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
     roomCode = "";
     for(let i=0; i<6; i++) roomCode += chars.charAt(Math.floor(Math.random() * chars.length));
-    document.getElementById('display-room-code').innerText = roomCode;
+    document.getElementById('display-room-code').innerText = "ĐANG KẾT NỐI MÁY CHỦ...";
 
     // Khởi tạo PeerJS Server với cấu hình STUN
     peer = new Peer(ROOM_PREFIX + roomCode, peerConfig);
     
     peer.on('open', (id) => {
         console.log("Phòng đã mở với ID: " + id);
+        document.getElementById('display-room-code').innerText = roomCode;
+    });
+
+    peer.on('error', (err) => {
+        document.getElementById('display-room-code').innerText = "LỖI: " + err.type;
+        alert("Lỗi máy chủ: " + err.message + ". Vui lòng F5 lại trang.");
     });
 
     // Xử lý khi có học sinh kết nối vào
@@ -189,13 +195,15 @@ document.getElementById('btn-join-room').addEventListener('click', () => {
         return;
     }
     
-    errorMsg.innerText = "Đang kết nối...";
+    errorMsg.innerText = "Bước 1: Đang khởi tạo kết nối mạng...";
     peer = new Peer(peerConfig);
     
     peer.on('open', () => {
-        hostConn = peer.connect(ROOM_PREFIX + code);
+        errorMsg.innerText = "Bước 2: Đang tìm mã phòng " + code + "...";
+        hostConn = peer.connect(ROOM_PREFIX + code, { reliable: true });
         
         hostConn.on('open', () => {
+            errorMsg.innerText = "Bước 3: Đã tìm thấy phòng, đang xin vào...";
             hostConn.send({ type: 'JOIN', name: name });
         });
 
@@ -228,13 +236,17 @@ document.getElementById('btn-join-room').addEventListener('click', () => {
         hostConn.on('close', () => {
             alert("Mất kết nối tới Giáo viên!");
         });
+        
+        hostConn.on('error', (err) => {
+            errorMsg.innerText = "Lỗi kết nối phòng: " + err.message;
+        });
     });
 
     peer.on('error', (err) => {
         if(err.type === 'peer-unavailable') {
-            errorMsg.innerText = "Không tìm thấy phòng! Vui lòng kiểm tra lại mã.";
+            errorMsg.innerText = "Không tìm thấy phòng! Cô/Thầy giáo đã thoát hoặc mã sai.";
         } else {
-            errorMsg.innerText = "Lỗi mạng: " + err.message;
+            errorMsg.innerText = "Lỗi mạng (" + err.type + "): " + err.message;
         }
     });
 });
