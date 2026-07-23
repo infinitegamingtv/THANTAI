@@ -14,7 +14,9 @@ const peerConfig = {
             { urls: 'stun:stun.l.google.com:19302' },
             { urls: 'stun:stun1.l.google.com:19302' },
             { urls: 'turn:openrelay.metered.ca:80', username: 'openrelayproject', credential: 'openrelayproject' },
-            { urls: 'turn:openrelay.metered.ca:443', username: 'openrelayproject', credential: 'openrelayproject' }
+            { urls: 'turn:openrelay.metered.ca:443', username: 'openrelayproject', credential: 'openrelayproject' },
+            // Ép buộc kết nối qua TCP (rất quan trọng cho một số nhà mạng 4G/5G chặn cổng UDP)
+            { urls: 'turn:openrelay.metered.ca:443?transport=tcp', username: 'openrelayproject', credential: 'openrelayproject' }
         ]
     }
 };
@@ -203,12 +205,12 @@ document.getElementById('btn-join-room').addEventListener('click', () => {
         // Bỏ các cờ cấu hình phụ vì chúng có thể gây lỗi rẽ nhánh dữ liệu trên một số trình duyệt
         hostConn = peer.connect(ROOM_PREFIX + code);
         
-        // Tăng timeout lên 15 giây
+        // Tăng timeout lên 30 giây vì mạng di động qua máy chủ TURN đôi khi mất rất nhiều thời gian đàm phán
         const timeoutId = setTimeout(() => {
             if(errorMsg.innerText.includes("Bước 2")) {
-                errorMsg.innerText = "Lỗi: Không thể xuyên thủng tường lửa mạng P2P. Bạn thử phát 3G/4G cho máy tính rồi thử lại xem sao nhé!";
+                errorMsg.innerText = "Lỗi: Không thể xuyên thủng tường lửa mạng P2P (Đã thử mọi cách: UDP/TCP TURN). Nguyên nhân lớn nhất là máy tính Giáo viên đang chạy cache cũ không khớp cấu hình!";
             }
-        }, 15000);
+        }, 30000);
         
         hostConn.on('open', () => {
             clearTimeout(timeoutId);
