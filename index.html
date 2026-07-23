@@ -3,10 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Tự động xóa cache của trình duyệt -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
     <title>Witch & Magic Pea - The English Game</title>
     <!-- Import Font ngộ nghĩnh cho trẻ em -->
     <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+    <script>
+        // Load CSS với timestamp để ép trình duyệt tải bản mới nhất
+        document.write('<link rel="stylesheet" href="style.css?v=' + new Date().getTime() + '">');
+    </script>
     <!-- Thư viện PeerJS để chạy WebRTC -->
     <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
 </head>
@@ -135,6 +142,11 @@
 
     </div>
     
-    <script src="script.js"></script>
+    <script>
+        // Load JS với timestamp để ép trình duyệt luôn tải file script.js mới nhất, tránh mọi lỗi cache
+        var script = document.createElement('script');
+        script.src = "script.js?v=" + new Date().getTime();
+        document.body.appendChild(script);
+    </script>
 </body>
 </html>
