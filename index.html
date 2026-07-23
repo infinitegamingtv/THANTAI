@@ -14,8 +14,9 @@
         // Load CSS với timestamp để ép trình duyệt tải bản mới nhất
         document.write('<link rel="stylesheet" href="style.css?v=' + new Date().getTime() + '">');
     </script>
-    <!-- Thư viện PeerJS để chạy WebRTC -->
-    <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+    <!-- Firebase SDK (Compat - chạy trực tiếp trên CDN, không cần build) -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
 </head>
 <body>
     <!-- Nhạc nền và hiệu ứng âm thanh (Audio Web API) -->
